@@ -15,7 +15,7 @@ public class ReentrantLockDemo implements Runnable {
     public void set(){
         try{
             reentrantLock.lock();
-            System.out.println("我把它锁住啦");
+            System.out.println("锁住");
             get();
         }catch(Exception e){
             e.printStackTrace();
@@ -28,7 +28,7 @@ public class ReentrantLockDemo implements Runnable {
     public void get(){
         try{
             reentrantLock.lock();
-            System.out.println("我拿到它啦");
+            System.out.println("获取到");
         }catch(Exception e){
             e.printStackTrace();
         }finally{
@@ -37,7 +37,20 @@ public class ReentrantLockDemo implements Runnable {
         }
     }
 
-    public static void main(String[] args){
-        new Thread(new ReentrantLockDemo()).start();
+    public static void main(String[] args) throws InterruptedException{
+        //        new Thread(new ReentrantLockDemo()).start();
+        ReentrantLock lock = new ReentrantLock();
+        lock.lock();
+        System.out.println("main thread lock!");
+        for(int i = 0; i < 50; i++){
+            new Thread(()->{
+                lock.lock();
+                System.out.println(Thread.currentThread().getId() + " acquire lock.");
+                lock.unlock();
+            }).start();
+            Thread.sleep(100);
+        }
+        lock.unlock();
+        System.out.println("main thread unlock!");
     }
 }
